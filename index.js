@@ -13,7 +13,7 @@ db();
 
 
 import authRoutes from './routes/auth.js';
-import notesRoutes from './routes/notes.js';
+import articleRoutes from './routes/articles.js';
 
 
 
@@ -22,7 +22,7 @@ app.use(json());
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/notes', notesRoutes);
+app.use('/api/articles', articleRoutes);
 
 
 
