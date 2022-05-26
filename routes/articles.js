@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import fetchUser from '../middleware/fetchUser.js';
 import User from '../models/User.js';
 import Articles from '../models/articles.js';
-import { failed_response, success_response } from '../utils/resoponseType.js';
+import { failed_response, success_response } from '../utils/responseType.js';
 import { saveImage } from '../utils/saveImage.js';
 import articles from '../models/articles.js';
 
@@ -11,7 +11,7 @@ const router = Router();
 
 
 // Display all the articles based on preferences 
-router.get('/', fetchUser, (req, res) => {
+router.get('/', fetchUser, async (req, res) => {
 
     try{
         const userId = req.user;
@@ -26,15 +26,16 @@ router.get('/', fetchUser, (req, res) => {
 
         const response = [];
 
-        userPreferences.forEach((preference) => {
-            const articles = await Articles.find({category: preference});
-            
-            articles.filter((article) => {
+        for(let preference of userPreferences){
+            let articles = await Articles.find({category: preference}); 
+            articles = articles.filter((article) => {
                 return article.blocked === false
-            });
+            })
 
             response.push(articles);
-        });
+        }
+
+
 
         if(response.length == 0){
             const result = failed_response(400, "Failed to fetch articles");
@@ -54,15 +55,11 @@ router.get('/', fetchUser, (req, res) => {
 
 
 // Display all the articles of a particular user
-router.get('/:id', fetchUser, async (req, res) => {
+router.get('/user', fetchUser, async (req, res) => {
 
     try{
         
-        const user = await User.findById(req.params.id);
-        if(user == null) {
-            const result = failed_response(400, "User not found");
-            return res.status(400).json(result);
-        }
+        const userId = req.user;
 
         const articles = await Articles.find({userId: userId});
 
@@ -92,6 +89,7 @@ router.post('/new', fetchUser,
         body('category').isLength({min: 3})
     ],
      async (req, res) => {
+        console.log(req.body);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -136,11 +134,15 @@ router.post('/new', fetchUser,
 router.put('/:id', fetchUser, async (req, res) => {
 
     try{
+        if(Object.keys(req.body).length <= 0){
+            const result = failed_response(500, "No fields to update");
+            return res.status(500).json(result);
+        }
 
         const articleId = req.params.id;
         const userId = req.user;
 
-        const article = await Articles.find({id: articleId, userId: userId});
+        const article = await Articles.find({_id: articleId, userId: userId});
         if(article == null){
             const result = failed_response(400, "Article not found");
             return res.status(400).json(result);
@@ -149,7 +151,7 @@ router.put('/:id', fetchUser, async (req, res) => {
         const fields = req.body;
         const articleData = {};
 
-        for(let key of fields){
+        for(let key in fields){
             if(key === "userId"){
                 const result = failed_response(403, "Unauthorized Operation");
                 return res.status(403).json(result);
@@ -172,7 +174,7 @@ router.put('/:id', fetchUser, async (req, res) => {
 
     } catch(err){
         console.error(err);
-        result = failed_response(500, "Internal Server Error");
+        const result = failed_response(500, "Internal Server Error");
         res.status(500).json(result);
     }
 

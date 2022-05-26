@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import express, { urlencoded, json } from 'express';
+import express, {urlencoded, json} from 'express';
 import db from './db.js';
 import cors from 'cors';
 

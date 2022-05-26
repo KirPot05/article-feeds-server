@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { failed_response } from '../utils/resoponseType.js';
+import { failed_response } from '../utils/responseType.js';
 
 
 // MiddleWare for fetching User data from DB

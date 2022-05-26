@@ -17,8 +17,7 @@ const articleSchema = new mongoose.Schema({
     },
 
     articleImgType: {
-        type: String, 
-        required: true
+        type: String
     },
 
     tags: {

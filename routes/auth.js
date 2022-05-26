@@ -6,7 +6,7 @@ import User from "../models/User.js";
 import jsonwebtoken from 'jsonwebtoken';
 import dotenv from "dotenv";
 import fetchUser from '../middleware/fetchUser.js';
-import { failed_response, success_response } from '../utils/resoponseType.js';
+import { failed_response, success_response } from '../utils/responseType.js';
 import { encryptPassword, getAuthToken, isCorrectPassword } from '../utils/passwordUtil.js';
 
 
